@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use Auth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class UserController extends Controller
@@ -18,7 +19,9 @@ class UserController extends Controller
     }
 
     public function dashboard() {     
-        return view('dashboard');
+        $notification = DB::select("SELECT users.id, users.fname, users.lname, users.email, COUNT(is_read) AS unread FROM users LEFT JOIN messages ON users.id = messages.from AND messages.is_read = 0 WHERE users.id = ".Auth::id()." GROUP BY users.id, users.fname, users.lname, users.email");
+        
+        return view('dashboard', compact('notification', ));
     }
 
     public function save_register(Request $request)
